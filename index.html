@@ -386,6 +386,7 @@
     .carousel-shell {
       position: relative;
       overflow: hidden;
+      touch-action: pan-y;
     }
 
     .carousel-track {
@@ -564,6 +565,42 @@
       .quick-facts,
       .stats {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .carousel-shell {
+        border-radius: 20px;
+      }
+
+      .slide {
+        min-height: auto;
+      }
+
+      .slide-media {
+        min-height: 200px;
+      }
+
+      .slide-content {
+        padding: 1.25rem;
+      }
+
+      .slide h3 {
+        font-size: 1.3rem;
+      }
+
+      .slide p {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .carousel-controls {
+        padding: 0.8rem 1rem;
+      }
+
+      .control-btn {
+        width: 40px;
+        height: 40px;
       }
     }
   </style>
@@ -853,7 +890,7 @@
             </article>
 
             <article class="slide">
-              <div class="slide-media" style="background-image:url('pics/eswc_2022_paper_presentation.jpeg');"></div>
+              <div class="slide-media" style="background-image:url('pics/eswc_2022_paper_presentation.png');"></div>
               <div class="slide-content">
                 <div class="slide-kicker">Conference Presentation</div>
                 <h3>Presenting research at ESWC</h3>
@@ -1038,9 +1075,36 @@
     const dotsWrap = document.getElementById('dots');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
+    const carouselShell = document.querySelector('.carousel-shell');
 
     let currentIndex = 0;
     let autoPlay;
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50;
+
+    carouselShell.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    carouselShell.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].clientX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+
+      if (Math.abs(swipeDistance) < swipeThreshold) return;
+
+      if (swipeDistance < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+
+      resetAutoPlay();
+    }
 
     function createDots() {
       slides.forEach((_, index) => {
